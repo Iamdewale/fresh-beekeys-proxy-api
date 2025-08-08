@@ -6,7 +6,6 @@ module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight
   if (req.method === "OPTIONS") return res.status(200).end();
 
   try {
@@ -24,15 +23,22 @@ module.exports = async (req, res) => {
     }
 
     const json = await response.json();
+    console.log("API response:", json);
 
-    if (!Array.isArray(json.data)) {
-      throw new Error("Unexpected API format: expected 'data' array");
+    // Check if json is an array or an object with data array
+    let dataArray;
+    if (Array.isArray(json)) {
+      dataArray = json;
+    } else if (Array.isArray(json.data)) {
+      dataArray = json.data;
+    } else {
+      throw new Error("Unexpected API format: expected array or data array");
     }
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
       message: "Success!",
-      data: json.data.slice(0, 3), // or all data
+      data: dataArray.slice(0, 3),
     });
   } catch (error) {
     console.error("API Proxy Error:", error.message);
