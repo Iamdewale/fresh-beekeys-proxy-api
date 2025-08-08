@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   try {
-    const API_URL = `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/?consumer_key=${process.env.NG_API_KEY}&consumer_secret=${process.env.NG_SECRET_KEY}`;
+    const API_URL = `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/?consumer_key=${process.env.NG_API_KEY}&consumer_secret=${process.env.NG_API_SECRET}`;
 
     const response = await fetch(API_URL);
     const contentType = response.headers.get("content-type");
