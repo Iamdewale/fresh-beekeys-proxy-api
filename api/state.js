@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
   if (!slug) return res.status(400).json({ error: "Missing slug" });
 
   try {
-    const url = `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/${slug}?country=nigeria&consumer_key=${process.env.NG_KEY}&consumer_secret=${process.env.NG_SECRET}`;
+    const url = `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/${slug}?country=nigeria&consumer_key=${process.env.NG_API_KEY}&consumer_secret=${process.env.NG_API_SECRET}`;
 
     const response = await fetch(url);
     const data = await response.json();
