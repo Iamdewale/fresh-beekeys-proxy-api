@@ -1,34 +1,28 @@
-export default async function handler(req, res) {
+const fetch = require("node-fetch");
+
+module.exports = async (req, res) => {
   const { slug } = req.query;
 
-  if (!slug) {
-    return res.status(400).json({ error: "Missing slug" });
-  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") return res.status(200).end();
+
+  if (!slug) return res.status(400).json({ error: "Missing slug" });
 
   try {
-    const response = await fetch(
-      `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/${slug}?country=nigeria`
-    );
+    const url = `https://app.beekeys.com/nigeria/wp-json/geodir/v2/locations/regions/${slug}?country=nigeria&consumer_key=${process.env.BEEKEYS_KEY}&consumer_secret=${process.env.BEEKEYS_SECRET}`;
 
-    const contentType = response.headers.get("content-type");
-
-    // If response isn't JSON (e.g., HTML error), show it safely
-    if (!contentType || !contentType.includes("application/json")) {
-      const raw = await response.text();
-      return res.status(502).json({
-        error: "Invalid response from upstream server",
-        detail: raw.slice(0, 300) + "...", // for debugging
-      });
-    }
-
+    const response = await fetch(url);
     const data = await response.json();
 
-    // Optional CORS header for localhost (not needed on Vercel)
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    if (!response.ok || !data) {
+      throw new Error("Invalid response from Beekeys API");
+    }
 
     res.status(200).json(data);
   } catch (error) {
-    console.error("Proxy error:", error.message);
-    res.status(500).json({ error: "Proxy failed", message: error.message });
+    res.status(500).json({ error: "Proxy failed", detail: error.message });
   }
-}
+};

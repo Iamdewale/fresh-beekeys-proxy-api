@@ -39,4 +39,3 @@ module.exports = async (req, res) => {
     });
   }
 };
-// api/region.js
